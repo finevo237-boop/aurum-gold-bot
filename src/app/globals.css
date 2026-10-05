@@ -1,0 +1,200 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #070605;
+  --color-coal: #0c0a08;
+  --color-panel: #12100c;
+  --color-line: rgba(214, 175, 55, 0.13);
+  --color-gold-200: #f7ecc8;
+  --color-gold-300: #f2dc96;
+  --color-gold-400: #e8c85f;
+  --color-gold-500: #d4af37;
+  --color-gold-600: #a8873a;
+  --color-gold-700: #6f5a24;
+  --color-bull: #2dd4a0;
+  --color-bear: #f4637c;
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-grotesk), system-ui, sans-serif;
+  --font-mono: var(--font-jbmono), ui-monospace, monospace;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 175, 55, 0.25) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.2);
+  border-radius: 8px;
+}
+
+html,
+body {
+  background: var(--color-ink);
+  color: #e9e4d8;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgba(212, 175, 55, 0.85);
+  color: #0c0a08;
+}
+
+/* ——— texture & fond ——— */
+.bg-scene {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.bg-scene::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(900px 500px at 85% -10%, rgba(212, 175, 55, 0.1), transparent 60%),
+    radial-gradient(700px 500px at -10% 40%, rgba(212, 175, 55, 0.05), transparent 55%),
+    radial-gradient(600px 600px at 50% 120%, rgba(180, 130, 40, 0.07), transparent 60%);
+}
+.bg-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(212, 175, 55, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212, 175, 55, 0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 30%, transparent 75%);
+}
+.noise {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.05'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ——— composants de base ——— */
+.panel {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
+  border: 1px solid var(--color-line);
+  border-radius: 20px;
+  backdrop-filter: blur(6px);
+}
+.panel-hover {
+  transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+}
+.panel-hover:hover {
+  border-color: rgba(212, 175, 55, 0.32);
+  transform: translateY(-2px);
+}
+
+.gold-text {
+  background: linear-gradient(115deg, #f7ecc8 5%, #d4af37 40%, #9c7c2e 60%, #f2dc96 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.75);
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.25), transparent);
+}
+
+/* ——— animations ——— */
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+@keyframes ping-gold {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+@keyframes tickup {
+  0% {
+    color: #2dd4a0;
+  }
+  100% {
+    color: inherit;
+  }
+}
+@keyframes tickdown {
+  0% {
+    color: #f4637c;
+  }
+  100% {
+    color: inherit;
+  }
+}
+.anim-tick-up {
+  animation: tickup 0.9s ease-out;
+}
+.anim-tick-down {
+  animation: tickdown 0.9s ease-out;
+}
+.dot-live {
+  position: relative;
+}
+.dot-live::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: ping-gold 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+.shimmer-text {
+  background: linear-gradient(100deg, rgba(212, 175, 55, 0.4) 30%, #f7ecc8 50%, rgba(212, 175, 55, 0.4) 70%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 3.2s linear infinite;
+}
+
+input,
+select {
+  outline: none;
+}
+input:focus,
+select:focus {
+  border-color: rgba(212, 175, 55, 0.55) !important;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
+}
+
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}

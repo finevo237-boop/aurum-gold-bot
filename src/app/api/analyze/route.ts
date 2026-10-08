@@ -7,22 +7,23 @@ import { desc } from "drizzle-orm";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-/ POST : lance une analyse manuelle */
+// POST : Lancement manuel via le bouton Analyser
 export async function POST() {
   try {
     const outcome = await runScan("manual");
     return NextResponse.json(outcome);
   } catch (e) {
     return NextResponse.json(
-      { error: e instanceof Error ? e.message : "Analyse impossible" },
+      { error: e instanceof Error ? e.message : "Erreur analyse" },
       { status: 502 }
     );
   }
 }
 
-/ GET : soit déclenché par le Cron (?cron=true) pour un scan auto, soit renvoie le dernier scan */
+// GET : Analyse automatique (cron) ou lecture de la base
 export async function GET(req: NextRequest) {
-  const isCron = req.nextUrl.searchParams.get("cron") === "true";
+  const { searchParams } = new URL(req.url);
+  const isCron = searchParams.get("cron") === "true";
 
   if (isCron) {
     try {
@@ -30,7 +31,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ cron: true, outcome });
     } catch (e) {
       return NextResponse.json(
-        { error: e instanceof Error ? e.message : "Erreur cron scan" },
+        { error: e instanceof Error ? e.message : "Erreur scan auto" },
         { status: 500 }
       );
     }

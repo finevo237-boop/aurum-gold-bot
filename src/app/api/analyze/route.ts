@@ -1,12 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { runScan } from "@/lib/scanner";
 import { db } from "@/db";
 import { scans } from "@/db/schema";
 import { desc } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-/** POST : lance une analyse complète immédiate (SMC + ICT multi-TF) */
+/ POST : lance une analyse manuelle */
 export async function POST() {
   try {
     const outcome = await runScan("manual");
@@ -19,8 +20,22 @@ export async function POST() {
   }
 }
 
-/** GET : dernière analyse enregistrée */
-export async function GET() {
+/ GET : soit déclenché par le Cron (?cron=true) pour un scan auto, soit renvoie le dernier scan */
+export async function GET(req: NextRequest) {
+  const isCron = req.nextUrl.searchParams.get("cron") === "true";
+
+  if (isCron) {
+    try {
+      const outcome = await runScan("auto");
+      return NextResponse.json({ cron: true, outcome });
+    } catch (e) {
+      return NextResponse.json(
+        { error: e instanceof Error ? e.message : "Erreur cron scan" },
+        { status: 500 }
+      );
+    }
+  }
+
   try {
     const rows = await db.select().from(scans).orderBy(desc(scans.createdAt)).limit(1);
     if (!rows.length) return NextResponse.json({ analysis: null });
